@@ -1,0 +1,1515 @@
+<!doctype html>
+<html lang="vi">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Kêu Lô Tô Realtime</title>
+        <style>
+            :root {
+                --card: #121a33;
+                --text: #e8ecff;
+                --muted: #aab3d6;
+                --ok: #2ee59d;
+                --warn: #ffcc66;
+                --bad: #ff667a;
+            }
+            body {
+                margin: 0;
+                font-family:
+                    system-ui,
+                    -apple-system,
+                    Segoe UI,
+                    Roboto,
+                    Arial;
+                background: linear-gradient(180deg, #080c18, #0b1020 40%, #070a12);
+                color: var(--text);
+            }
+            .wrap {
+                max-width: 1250px;
+                margin: 0 auto;
+                padding: 18px;
+            }
+            h1 {
+                margin: 8px 0 2px;
+                font-size: 20px;
+            }
+            .sub {
+                color: var(--muted);
+                margin: 0 0 14px;
+                font-size: 13px;
+            }
+            .grid {
+                display: grid;
+                grid-template-columns: 430px 1fr;
+                gap: 14px;
+            }
+            @media (max-width: 980px) {
+                .grid {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            .card {
+                background: rgba(18, 26, 51, 0.9);
+                border: 1px solid rgba(255, 255, 255, 0.08);
+                border-radius: 14px;
+                padding: 14px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+            }
+            .row {
+                display: flex;
+                gap: 10px;
+                flex-wrap: wrap;
+                align-items: center;
+            }
+            label {
+                font-size: 12px;
+                color: var(--muted);
+            }
+            input,
+            select,
+            button {
+                border-radius: 12px;
+                border: 1px solid rgba(255, 255, 255, 0.12);
+                background: rgba(255, 255, 255, 0.06);
+                color: var(--text);
+                padding: 10px 12px;
+                font-size: 14px;
+                outline: none;
+            }
+            input {
+                width: 100%;
+                box-sizing: border-box;
+            }
+            button {
+                cursor: pointer;
+            }
+            button.primary {
+                background: rgba(46, 229, 157, 0.14);
+                border-color: rgba(46, 229, 157, 0.35);
+            }
+            button.danger {
+                background: rgba(255, 102, 122, 0.12);
+                border-color: rgba(255, 102, 122, 0.35);
+            }
+            button.ghost {
+                background: transparent;
+            }
+            button:disabled {
+                opacity: 0.55;
+                cursor: not-allowed;
+            }
+
+            .big {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                height: 150px;
+                border-radius: 16px;
+                background: radial-gradient(
+                    circle at 30% 30%,
+                    rgba(46, 229, 157, 0.22),
+                    rgba(255, 255, 255, 0.04) 55%,
+                    rgba(0, 0, 0, 0.08) 100%
+                );
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                font-size: 72px;
+                font-weight: 800;
+                letter-spacing: 2px;
+                position: relative;
+                overflow: hidden;
+            }
+            .big .mini {
+                position: absolute;
+                top: 10px;
+                left: 10px;
+                font-size: 12px;
+                color: var(--muted);
+                letter-spacing: 0;
+                font-weight: 600;
+            }
+            .big .quick {
+                position: absolute;
+                bottom: 10px;
+                left: 10px;
+                right: 10px;
+                display: none;
+                justify-content: center;
+                gap: 10px;
+            }
+
+            .status {
+                margin-top: 10px;
+                display: flex;
+                gap: 10px;
+                flex-wrap: wrap;
+                color: var(--muted);
+                font-size: 12px;
+            }
+            .pill {
+                padding: 6px 10px;
+                border-radius: 999px;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                background: rgba(255, 255, 255, 0.04);
+            }
+            .pill.ok {
+                border-color: rgba(46, 229, 157, 0.35);
+                background: rgba(46, 229, 157, 0.1);
+                color: #caffea;
+            }
+            .pill.warn {
+                border-color: rgba(255, 204, 102, 0.35);
+                background: rgba(255, 204, 102, 0.1);
+                color: #ffe7b3;
+            }
+            .pill.bad {
+                border-color: rgba(255, 102, 122, 0.35);
+                background: rgba(255, 102, 122, 0.1);
+                color: #ffd0d7;
+            }
+
+            .nums {
+                display: grid;
+                grid-template-columns: repeat(10, 1fr);
+                gap: 6px;
+            }
+            .n {
+                text-align: center;
+                padding: 8px 0;
+                border-radius: 10px;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                background: rgba(255, 255, 255, 0.04);
+                font-variant-numeric: tabular-nums;
+                user-select: none;
+            }
+            .n.called {
+                background: rgba(46, 229, 157, 0.18);
+                border-color: rgba(46, 229, 157, 0.4);
+                color: #d8fff1;
+                font-weight: 700;
+            }
+            .n.last {
+                outline: 2px solid rgba(255, 204, 102, 0.55);
+            }
+
+            .split {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 14px;
+            }
+            @media (max-width: 980px) {
+                .split {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            .ticket {
+                display: grid;
+                gap: 8px;
+                margin-top: 10px;
+            }
+            .tcell {
+                padding: 12px 0;
+                text-align: center;
+                border-radius: 12px;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                background: rgba(255, 255, 255, 0.04);
+                font-weight: 700;
+                font-variant-numeric: tabular-nums;
+                user-select: none;
+            }
+            .tcell.called {
+                box-shadow: inset 0 0 0 2px rgba(46, 229, 157, 0.35);
+            }
+
+            .hint {
+                font-size: 12px;
+                color: var(--muted);
+                margin-top: 10px;
+                line-height: 1.45;
+            }
+            .small {
+                font-size: 12px;
+                color: var(--muted);
+            }
+            .hr {
+                height: 1px;
+                background: rgba(255, 255, 255, 0.1);
+                margin: 12px 0;
+            }
+            .mono {
+                font-family:
+                    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+            }
+
+            /* Winner overlay (có nút ván mới) */
+            #winnerOverlay {
+                position: fixed;
+                inset: 0;
+                display: none;
+                background: rgba(0, 0, 0, 0.72);
+                align-items: center;
+                justify-content: center;
+                z-index: 9999;
+                padding: 18px;
+            }
+            .winnerBox {
+                width: min(600px, 100%);
+                border-radius: 18px;
+                border: 1px solid rgba(255, 255, 255, 0.15);
+                background: linear-gradient(180deg, rgba(18, 26, 51, 0.98), rgba(10, 14, 26, 0.98));
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
+                padding: 16px;
+                text-align: center;
+            }
+            .winnerTitle {
+                font-size: 44px;
+                font-weight: 900;
+                margin: 8px 0 2px;
+                color: #ffe7b3;
+            }
+            .winnerSub {
+                color: var(--muted);
+                margin: 0 0 10px;
+            }
+            .winnerName {
+                font-size: 22px;
+                font-weight: 800;
+                margin: 6px 0 10px;
+            }
+            .winnerHint {
+                color: var(--muted);
+                font-size: 13px;
+                line-height: 1.5;
+                margin-top: 8px;
+            }
+
+            /* All tickets viewer */
+            .ticketsGrid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+                margin-top: 10px;
+            }
+            @media (max-width: 980px) {
+                .ticketsGrid {
+                    grid-template-columns: 1fr;
+                }
+            }
+            .pCard {
+                border-radius: 14px;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                background: rgba(255, 255, 255, 0.04);
+                padding: 10px;
+            }
+            .pHead {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: 10px;
+                color: var(--muted);
+                font-size: 12px;
+                margin-bottom: 8px;
+            }
+            .pName {
+                color: var(--text);
+                font-weight: 800;
+                font-size: 14px;
+            }
+        </style>
+
+        <!-- Firebase (compat) -->
+        <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    </head>
+    <body>
+        <!-- KINH overlay -->
+        <div id="winnerOverlay">
+            <div class="winnerBox">
+                <div class="winnerTitle">KINH!</div>
+                <p class="winnerSub">Ván đã dừng.</p>
+                <div class="winnerName" id="winnerName">—</div>
+
+                <div class="row" style="justify-content: center; margin-top: 10px">
+                    <button id="btnOverlayNewRound" class="primary">Bắt đầu ván mới</button>
+                    <button id="btnOverlayClose" class="ghost">Đóng</button>
+                </div>
+
+                <div class="winnerHint" id="winnerHint">
+                    MC bấm “Bắt đầu ván mới” để chuyển sang <b>CHỜ</b> (mọi người đổi/tạo vé), sau đó bấm
+                    <b>Bắt đầu chơi</b>.
+                </div>
+            </div>
+        </div>
+
+        <div class="wrap">
+            <h1>🎲 Kêu Lô Tô Realtime</h1>
+            <p class="sub">
+                Có trạng thái CHỜ để đổi vé. KINH xong chuyển về CHỜ. Chỉ người chưa có vé mới thấy “All vé”.
+            </p>
+
+            <div class="grid">
+                <!-- LEFT -->
+                <div class="card">
+                    <div class="row" style="justify-content: space-between">
+                        <div style="flex: 1; min-width: 190px">
+                            <label>Mã phòng</label><br />
+                            <input id="roomId" placeholder="VD: 482913" />
+                        </div>
+                        <button id="btnCreate" class="ghost" title="Tạo mã phòng ngẫu nhiên">Tạo phòng</button>
+                    </div>
+
+                    <div class="row" style="margin-top: 10px">
+                        <div style="flex: 1; min-width: 220px">
+                            <label>Tên của bạn</label><br />
+                            <input id="playerName" placeholder="VD: An, Bình, Chị Hoa..." maxlength="24" />
+                        </div>
+                    </div>
+
+                    <div class="hr"></div>
+
+                    <div class="row">
+                        <button id="btnJoin" class="primary">Vào phòng</button>
+                        <button id="btnLeave" class="ghost" disabled>Rời phòng</button>
+                    </div>
+
+                    <div class="hint">
+                        <div>
+                            <b>Lưu ý:</b> File này dùng <b>Firebase Realtime Database</b>. Bạn phải dán
+                            <span class="mono">firebaseConfig</span> trong phần JS.
+                        </div>
+                    </div>
+
+                    <div class="hr"></div>
+
+                    <!-- MC RIGHTS -->
+                    <div>
+                        <div style="font-weight: 800">Quyền MC</div>
+                        <div class="small" id="mcInfo" style="margin-top: 6px">Chưa vào phòng</div>
+
+                        <div class="row" style="margin-top: 10px">
+                            <button id="btnClaimMC" class="primary" disabled>Nhận quyền MC</button>
+                            <button id="btnReleaseMC" class="ghost" disabled>Nhường quyền MC</button>
+                        </div>
+
+                        <div id="transferWrap" style="margin-top: 10px; display: none">
+                            <div class="row">
+                                <select id="transferTo" style="flex: 1; min-width: 200px"></select>
+                                <button id="btnTransferMC" class="primary">Trao quyền</button>
+                            </div>
+                            <div class="hint">Chỉ MC hiện tại mới trao quyền được.</div>
+                        </div>
+                    </div>
+
+                    <div class="hr"></div>
+
+                    <!-- MC PANEL -->
+                    <div>
+                        <div style="font-weight: 800">Bảng điều khiển MC</div>
+
+                        <div class="row" style="margin-top: 10px">
+                            <div style="flex: 1; min-width: 180px">
+                                <label>Kích thước vé (chỉ khi CHỜ)</label><br />
+                                <select id="ticketSize" disabled>
+                                    <option value="5x5">5 x 5</option>
+                                    <option value="9x5">9 x 5</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row" style="margin-top: 10px">
+                            <button id="btnNewRound" class="primary" disabled>Bắt đầu ván mới</button>
+                            <button id="btnStartPlay" class="primary" disabled>Bắt đầu chơi</button>
+                        </div>
+
+                        <div class="row" style="margin-top: 10px">
+                            <button id="btnDraw" class="primary" disabled>Kêu số</button>
+                            <button id="btnUndo" class="ghost" disabled>Lùi 1 số</button>
+                            <button id="btnResetRoom" class="danger" disabled>Xoá phòng</button>
+                        </div>
+
+                        <div class="row" style="margin-top: 10px">
+                            <label class="small"><input type="checkbox" id="chkSpeak" checked /> Đọc số</label>
+                            <label class="small"><input type="checkbox" id="chkLock" /> Tạm khoá kêu số</label>
+                        </div>
+
+                        <div class="hint" id="phaseHint">—</div>
+                    </div>
+
+                    <div class="hr"></div>
+
+                    <!-- PLAYER TICKET -->
+                    <div>
+                        <div style="font-weight: 800">Vé của bạn</div>
+                        <div class="small" id="myTicketInfo" style="margin-top: 6px">—</div>
+
+                        <div class="row" style="justify-content: space-between; margin-top: 10px">
+                            <button id="btnNewTicket" class="primary" disabled>Tạo / Đổi vé</button>
+                            <button id="btnClearMarks" class="ghost" disabled>Xoá đánh dấu</button>
+                        </div>
+
+                        <div class="hint">
+                            Chỉ tạo/đổi vé khi <b>CHỜ</b>. Khi <b>ĐANG CHƠI</b>, người có vé sẽ không thấy vé người
+                            khác.
+                        </div>
+
+                        <div id="ticketWrap" style="display: none">
+                            <div class="ticket" id="ticket"></div>
+                            <div id="winMsg" class="hint"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT -->
+                <div class="card">
+                    <div class="split">
+                        <div>
+                            <div class="big" id="bigBox">
+                                <div class="mini" id="phaseMini">—</div>
+                                <span id="lastNumValue">—</span>
+                                <div class="quick" id="mcQuickBar">
+                                    <button id="btnQuickNewRound" class="primary">Bắt đầu ván mới</button>
+                                </div>
+                            </div>
+
+                            <div class="status">
+                                <div class="pill" id="connPill">Chưa vào phòng</div>
+                                <div class="pill" id="phasePill">Trạng thái: —</div>
+                                <div class="pill" id="countPill">Đã kêu: 0/90</div>
+                                <div class="pill warn" id="lockPill" style="display: none">Đang khoá</div>
+                                <div class="pill ok" id="playersPill">Người chơi: 0</div>
+                            </div>
+
+                            <div class="hint" id="roomInfo"></div>
+
+                            <div class="hr"></div>
+                            <div style="font-weight: 800">Danh sách trong phòng</div>
+                            <div class="small" id="playersList" style="margin-top: 6px">—</div>
+                        </div>
+
+                        <div>
+                            <div style="font-weight: 800">Bảng 1–90</div>
+                            <div class="small">Số đã kêu tô xanh, số mới nhất viền vàng.</div>
+                            <div style="margin-top: 10px" class="nums" id="board"></div>
+                        </div>
+                    </div>
+
+                    <div class="hr"></div>
+                    <div class="small">Lịch sử (mới nhất bên phải):</div>
+                    <div id="history" class="row" style="margin-top: 8px; gap: 6px; flex-wrap: wrap"></div>
+
+                    <div class="hr"></div>
+
+                    <!-- ALL TICKETS (chỉ hiện cho người CHƯA CÓ VÉ hợp lệ) -->
+                    <div id="allTicketsPanel" style="display: none">
+                        <div style="font-weight: 800">All vé (chỉ dành cho người chưa có vé)</div>
+                        <div class="small" id="allTicketsHint" style="margin-top: 6px">—</div>
+                        <div class="ticketsGrid" id="allTickets"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            /* =======================
+   1) DÁN firebaseConfig Ở ĐÂY
+   ======================= */
+            const firebaseConfig = {
+                apiKey: 'AIzaSyAQgtLBcX1LBY8xgBMAvuAVB9ll3pXRMAY',
+                authDomain: 'tuv0-8cce5.firebaseapp.com',
+                databaseURL: 'https://tuv0-8cce5-default-rtdb.asia-southeast1.firebasedatabase.app',
+                projectId: 'tuv0-8cce5',
+                storageBucket: 'tuv0-8cce5.firebasestorage.app',
+                messagingSenderId: '375419013161',
+                appId: '1:375419013161:web:384d907409ee82020d7438',
+            };
+
+            /* =======================
+   2) APP LOGIC
+   ======================= */
+            let app, db;
+            let roomId = '';
+            let roomRef = null;
+
+            const $ = (id) => document.getElementById(id);
+
+            const roomInput = $('roomId');
+            const nameInput = $('playerName');
+
+            const connPill = $('connPill');
+            const phasePill = $('phasePill');
+            const countPill = $('countPill');
+            const lockPill = $('lockPill');
+            const playersPill = $('playersPill');
+            const lastNumValue = $('lastNumValue');
+            const roomInfo = $('roomInfo');
+            const boardEl = $('board');
+            const historyEl = $('history');
+            const playersListEl = $('playersList');
+
+            const btnCreate = $('btnCreate');
+            const btnJoin = $('btnJoin');
+            const btnLeave = $('btnLeave');
+
+            const mcInfo = $('mcInfo');
+            const btnClaimMC = $('btnClaimMC');
+            const btnReleaseMC = $('btnReleaseMC');
+            const transferWrap = $('transferWrap');
+            const transferTo = $('transferTo');
+            const btnTransferMC = $('btnTransferMC');
+
+            const ticketSizeSel = $('ticketSize');
+            const btnNewRound = $('btnNewRound');
+            const btnStartPlay = $('btnStartPlay');
+            const btnDraw = $('btnDraw');
+            const btnUndo = $('btnUndo');
+            const btnResetRoom = $('btnResetRoom');
+            const chkSpeak = $('chkSpeak');
+            const chkLock = $('chkLock');
+            const phaseHint = $('phaseHint');
+
+            const myTicketInfo = $('myTicketInfo');
+            const btnNewTicket = $('btnNewTicket');
+            const btnClearMarks = $('btnClearMarks');
+            const ticketWrap = $('ticketWrap');
+            const ticketEl = $('ticket');
+            const winMsg = $('winMsg');
+
+            const phaseMini = $('phaseMini');
+            const mcQuickBar = $('mcQuickBar');
+            const btnQuickNewRound = $('btnQuickNewRound');
+
+            const winnerOverlay = $('winnerOverlay');
+            const winnerNameEl = $('winnerName');
+            const winnerHintEl = $('winnerHint');
+            const btnOverlayNewRound = $('btnOverlayNewRound');
+            const btnOverlayClose = $('btnOverlayClose');
+
+            const allTicketsPanel = $('allTicketsPanel');
+            const allTicketsHint = $('allTicketsHint');
+            const allTicketsEl = $('allTickets');
+
+            const playerIdKey = 'loto_playerId_v4';
+            let playerId = localStorage.getItem(playerIdKey);
+            if (!playerId) {
+                playerId = crypto?.randomUUID?.() || 'p' + Math.random().toString(16).slice(2);
+                localStorage.setItem(playerIdKey, playerId);
+            }
+
+            let playerRef = null;
+            let heartbeatTimer = null;
+
+            let isMC = false;
+            let lastSeenSpokenNum = null;
+            let lastWinSpokenAt = 0;
+
+            let localTicket = { ticket: [], marked: [], meta: null }; // meta: {roundId, rows, cols}
+            let marked = new Set();
+
+            function safeInitFirebase() {
+                try {
+                    if (!firebaseConfig || !firebaseConfig.apiKey || !firebaseConfig.databaseURL) {
+                        throw new Error('Thiếu firebaseConfig.apiKey hoặc firebaseConfig.databaseURL');
+                    }
+                    if (!firebase.apps?.length) app = firebase.initializeApp(firebaseConfig);
+                    db = firebase.database();
+                    return true;
+                } catch (e) {
+                    alert('Chưa cấu hình Firebase!\n\nHãy dán firebaseConfig trong file.\n\nChi tiết: ' + e.message);
+                    console.error(e);
+                    return false;
+                }
+            }
+
+            function genRoomId() {
+                return String(Math.floor(100000 + Math.random() * 900000));
+            }
+
+            function setConnectedUI(ok, msg) {
+                connPill.textContent = msg;
+                connPill.className = 'pill ' + (ok ? 'ok' : '');
+            }
+
+            function renderBoard(calledSet, last) {
+                boardEl.innerHTML = '';
+                for (let i = 1; i <= 90; i++) {
+                    const d = document.createElement('div');
+                    d.className = 'n' + (calledSet.has(i) ? ' called' : '') + (last === i ? ' last' : '');
+                    d.textContent = i;
+                    boardEl.appendChild(d);
+                }
+            }
+
+            function renderHistory(calledArr) {
+                historyEl.innerHTML = '';
+                const show = calledArr.slice(-30);
+                show.forEach((n) => {
+                    const s = document.createElement('div');
+                    s.className = 'pill ok';
+                    s.style.padding = '6px 10px';
+                    s.textContent = n;
+                    historyEl.appendChild(s);
+                });
+            }
+
+            function readNumberVN(n) {
+                const ones = ['không', 'một', 'hai', 'ba', 'bốn', 'năm', 'sáu', 'bảy', 'tám', 'chín'];
+                if (n < 10) return ones[n];
+                if (n < 20) {
+                    if (n === 10) return 'mười';
+                    if (n === 15) return 'mười lăm';
+                    if (n === 11) return 'mười một';
+                    return 'mười ' + ones[n % 10];
+                }
+                const tens = Math.floor(n / 10);
+                const unit = n % 10;
+                let res = ones[tens] + ' mươi';
+                if (unit === 0) return res;
+                if (unit === 1) return res + ' mốt';
+                if (unit === 4) return res + ' tư';
+                if (unit === 5) return res + ' lăm';
+                return res + ' ' + ones[unit];
+            }
+
+            function speak(text) {
+                try {
+                    if (!('speechSynthesis' in window)) return;
+                    const u = new SpeechSynthesisUtterance(text);
+                    u.lang = 'vi-VN';
+                    window.speechSynthesis.cancel();
+                    window.speechSynthesis.speak(u);
+                } catch {}
+            }
+
+            /* ===== Ticket local + DB ===== */
+            function localTicketKey() {
+                return 'loto_ticket_' + roomId + '_' + playerId;
+            }
+
+            function loadTicketLocal() {
+                const raw = localStorage.getItem(localTicketKey());
+                if (!raw) return false;
+                try {
+                    const obj = JSON.parse(raw);
+                    if (!obj) return false;
+                    localTicket = obj;
+                    marked = new Set(obj.marked || []);
+                    return true;
+                } catch {
+                    return false;
+                }
+            }
+
+            function saveTicketLocal() {
+                localStorage.setItem(
+                    localTicketKey(),
+                    JSON.stringify({
+                        ticket: localTicket.ticket || [],
+                        marked: Array.from(marked),
+                        meta: localTicket.meta || null,
+                    }),
+                );
+            }
+
+            async function saveTicketToDB(ticket, meta) {
+                if (!playerRef) return;
+                await playerRef.update({
+                    ticket,
+                    ticketRoundId: meta.roundId,
+                    ticketRows: meta.rows,
+                    ticketCols: meta.cols,
+                    lastSeenAt: Date.now(),
+                });
+            }
+
+            function generateTicket(rows, cols) {
+                const total = rows * cols;
+                const nums = [];
+                const used = new Set();
+                while (nums.length < total) {
+                    const n = 1 + Math.floor(Math.random() * 90);
+                    if (!used.has(n)) {
+                        used.add(n);
+                        nums.push(n);
+                    }
+                }
+                return nums;
+            }
+
+            function isValidTicketForRound(me, game) {
+                const rows = game.ticketRows || 5;
+                const cols = game.ticketCols || 5;
+                const roundId = game.roundId || 0;
+
+                if (!me) return false;
+                if (!Array.isArray(me.ticket) || me.ticket.length !== rows * cols) return false;
+                if (me.ticketRoundId !== roundId) return false;
+                if (me.ticketRows !== rows || me.ticketCols !== cols) return false;
+                return true;
+            }
+
+            function hasAnyFullRow(ticketArr, rows, cols, calledSet) {
+                // KINH theo hàng ngang: đủ "cols" số trong 1 hàng
+                for (let r = 0; r < rows; r++) {
+                    let ok = true;
+                    for (let c = 0; c < cols; c++) {
+                        const n = ticketArr[r * cols + c];
+                        if (!calledSet.has(n)) {
+                            ok = false;
+                            break;
+                        }
+                    }
+                    if (ok) return true;
+                }
+                return false;
+            }
+
+            function renderMyTicket(game, me, calledSet) {
+                const rows = game.ticketRows || 5;
+                const cols = game.ticketCols || 5;
+                const roundId = game.roundId || 0;
+
+                const phase = game.phase || 'waiting';
+                const canEdit = phase === 'waiting';
+
+                const meHasValid = isValidTicketForRound(me, game);
+
+                if (!meHasValid) {
+                    ticketWrap.style.display = 'none';
+                    myTicketInfo.textContent = canEdit
+                        ? `Bạn chưa có vé hợp lệ cho ván này (Round ${roundId}). Hãy bấm “Tạo / Đổi vé”.`
+                        : `Bạn không có vé hợp lệ cho ván này (Round ${roundId}). Bạn đang xem.`;
+                    btnClearMarks.disabled = true;
+                    return;
+                }
+
+                myTicketInfo.textContent = `Vé hợp lệ (Round ${roundId}) • Kích thước: ${rows}x${cols} • Bạn đang ${phase === 'playing' ? 'chơi' : 'chờ'}.`;
+                btnClearMarks.disabled = !canEdit;
+
+                ticketWrap.style.display = 'block';
+                ticketEl.innerHTML = '';
+                ticketEl.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+
+                const ticketArr = me.ticket;
+
+                ticketArr.forEach((n, idx) => {
+                    const cell = document.createElement('div');
+                    const isCalled = calledSet.has(n);
+                    const isMarked = marked.has(idx);
+                    cell.className = 'tcell' + (isCalled ? ' called' : '') + (canEdit ? ' marked' : '');
+                    cell.textContent = n;
+
+                    if (canEdit) {
+                        cell.style.cursor = 'pointer';
+                        cell.addEventListener('click', () => {
+                            if (marked.has(idx)) marked.delete(idx);
+                            else marked.add(idx);
+                            saveTicketLocal();
+                            renderMyTicket(game, me, calledSet);
+                        });
+                    }
+
+                    ticketEl.appendChild(cell);
+                });
+
+                winMsg.textContent = `Luật KINH: đủ 1 hàng ngang (${cols} số) theo số đã kêu.`;
+            }
+
+            /* ===== Winner overlay ===== */
+            function showWinner(winner) {
+                winnerNameEl.textContent = winner?.name ? `Người “KINH”: ${winner.name}` : 'Người “KINH”: —';
+                winnerOverlay.style.display = 'flex';
+            }
+            function hideWinner() {
+                winnerOverlay.style.display = 'none';
+            }
+
+            /* ===== All tickets viewer (chỉ cho người chưa có vé hợp lệ) ===== */
+            function renderAllTicketsIfNeeded(game, playersObj, calledSet, meHasValid) {
+                if (meHasValid) {
+                    allTicketsPanel.style.display = 'none';
+                    allTicketsEl.innerHTML = '';
+                    return;
+                }
+
+                allTicketsPanel.style.display = 'block';
+                const rows = game.ticketRows || 5;
+                const cols = game.ticketCols || 5;
+                const roundId = game.roundId || 0;
+                const phase = game.phase || 'waiting';
+
+                const players = playersObj ? Object.values(playersObj) : [];
+                const list = players.filter((p) => p && p.name).sort((a, b) => (a.joinedAt || 0) - (b.joinedAt || 0));
+
+                const validCount = list.filter((p) => isValidTicketForRound(p, game)).length;
+                allTicketsHint.textContent = `Round ${roundId} • ${rows}x${cols} • Trạng thái: ${phase.toUpperCase()} • Vé hợp lệ: ${validCount}/${list.length}`;
+
+                allTicketsEl.innerHTML = '';
+                list.forEach((p) => {
+                    const card = document.createElement('div');
+                    card.className = 'pCard';
+
+                    const head = document.createElement('div');
+                    head.className = 'pHead';
+                    head.innerHTML = `
+      <div class="pName">${p.name}${p.id === game.mcPlayerId ? ' (MC)' : ''}</div>
+      <div>${isValidTicketForRound(p, game) ? 'Vé hợp lệ' : 'Chưa có vé'}</div>
+    `;
+                    card.appendChild(head);
+
+                    if (isValidTicketForRound(p, game)) {
+                        const grid = document.createElement('div');
+                        grid.className = 'ticket';
+                        grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+
+                        p.ticket.forEach((n) => {
+                            const cell = document.createElement('div');
+                            cell.className = 'tcell' + (calledSet.has(n) ? ' called' : '');
+                            cell.textContent = n;
+                            grid.appendChild(cell);
+                        });
+                        card.appendChild(grid);
+                    } else {
+                        const note = document.createElement('div');
+                        note.className = 'small';
+                        note.textContent = 'Không có vé hợp lệ cho ván này.';
+                        card.appendChild(note);
+                    }
+
+                    allTicketsEl.appendChild(card);
+                });
+            }
+
+            /* ===== Presence / register ===== */
+            async function registerPlayer() {
+                const name = (nameInput.value || '').trim();
+                if (!name) {
+                    alert('Bạn cần nhập Tên của bạn.');
+                    return false;
+                }
+
+                playerRef = db.ref(`rooms/${roomId}/players/${playerId}`);
+                try {
+                    playerRef.onDisconnect().remove();
+                } catch {}
+
+                const now = Date.now();
+                await playerRef.update({
+                    id: playerId,
+                    name,
+                    joinedAt: now,
+                    lastSeenAt: now,
+                });
+
+                if (heartbeatTimer) clearInterval(heartbeatTimer);
+                heartbeatTimer = setInterval(() => {
+                    if (playerRef) playerRef.update({ lastSeenAt: Date.now() });
+                }, 15000);
+
+                // restore local ticket marks only
+                loadTicketLocal();
+                return true;
+            }
+
+            async function unregisterPlayer() {
+                if (heartbeatTimer) {
+                    clearInterval(heartbeatTimer);
+                    heartbeatTimer = null;
+                }
+                if (playerRef) {
+                    try {
+                        await playerRef.remove();
+                    } catch {}
+                    playerRef = null;
+                }
+            }
+
+            /* ===== Room init ===== */
+            function ensureRoomStructure() {
+                const now = Date.now();
+                return roomRef.transaction((cur) => {
+                    if (cur === null) {
+                        return {
+                            createdAt: now,
+                            game: {
+                                roundId: now,
+                                phase: 'waiting', // waiting | playing | ended
+                                mcPlayerId: null,
+                                ticketRows: 5,
+                                ticketCols: 5,
+                                called: [],
+                                last: null,
+                                locked: false,
+                                winner: null,
+                                updatedAt: now,
+                            },
+                            players: {},
+                        };
+                    }
+                    if (!cur.game) {
+                        cur.game = {
+                            roundId: now,
+                            phase: 'waiting',
+                            mcPlayerId: null,
+                            ticketRows: 5,
+                            ticketCols: 5,
+                            called: [],
+                            last: null,
+                            locked: false,
+                            winner: null,
+                            updatedAt: now,
+                        };
+                    }
+                    if (cur.game.roundId === undefined) cur.game.roundId = now;
+                    if (cur.game.phase === undefined) cur.game.phase = 'waiting';
+                    if (cur.game.ticketRows === undefined) cur.game.ticketRows = 5;
+                    if (cur.game.ticketCols === undefined) cur.game.ticketCols = 5;
+                    if (cur.players === undefined) cur.players = {};
+                    return cur;
+                });
+            }
+
+            /* ===== MC rights ===== */
+            function claimMC() {
+                return roomRef.transaction((room) => {
+                    if (!room) return room;
+                    if (!room.game) room.game = {};
+                    if (!room.players) room.players = {};
+
+                    const mcId = room.game.mcPlayerId || null;
+                    const now = Date.now();
+                    const mcMissing = mcId && !room.players[mcId];
+                    const mcLastSeen = mcId && room.players[mcId]?.lastSeenAt ? room.players[mcId].lastSeenAt : 0;
+                    const mcStale = mcId && mcLastSeen && now - mcLastSeen > 45000;
+                    const canTakeover = !mcId || mcMissing || mcStale;
+                    if (!canTakeover) return;
+
+                    room.game.mcPlayerId = playerId;
+                    room.game.updatedAt = now;
+                    return room;
+                });
+            }
+            function releaseMC() {
+                return roomRef.transaction((room) => {
+                    if (!room || !room.game) return room;
+                    if (room.game.mcPlayerId !== playerId) return;
+                    room.game.mcPlayerId = null;
+                    room.game.updatedAt = Date.now();
+                    return room;
+                });
+            }
+            function transferMC(toId) {
+                return roomRef.transaction((room) => {
+                    if (!room || !room.game || !room.players) return room;
+                    if (room.game.mcPlayerId !== playerId) return;
+                    if (!toId || !room.players[toId]) return;
+                    room.game.mcPlayerId = toId;
+                    room.game.updatedAt = Date.now();
+                    return room;
+                });
+            }
+
+            /* ===== Game actions ===== */
+            function setTicketSize(rows, cols) {
+                // chỉ MC và chỉ khi waiting
+                const gameRef = db.ref(`rooms/${roomId}/game`);
+                return gameRef.transaction((game) => {
+                    if (!game) return game;
+                    if (game.mcPlayerId !== playerId) return game;
+                    if (game.phase !== 'waiting') return game;
+                    game.ticketRows = rows;
+                    game.ticketCols = cols;
+                    game.updatedAt = Date.now();
+                    return game;
+                });
+            }
+
+            function startNewRoundWaiting() {
+                // MC bấm: reset -> CHỜ (đổi vé), roundId mới
+                const gameRef = db.ref(`rooms/${roomId}/game`);
+                return gameRef.transaction((game) => {
+                    if (!game) return game;
+                    if (game.mcPlayerId && game.mcPlayerId !== playerId) return game;
+
+                    if (!game.mcPlayerId) game.mcPlayerId = playerId;
+
+                    const now = Date.now();
+                    game.roundId = now;
+                    game.phase = 'waiting';
+                    game.called = [];
+                    game.last = null;
+                    game.locked = false;
+                    game.winner = null;
+                    game.updatedAt = now;
+                    return game;
+                });
+            }
+
+            function startPlay() {
+                // chuyển WAITING -> PLAYING
+                const gameRef = db.ref(`rooms/${roomId}/game`);
+                return gameRef.transaction((game) => {
+                    if (!game) return game;
+                    if (game.mcPlayerId !== playerId) return game;
+                    if (game.phase !== 'waiting') return game;
+
+                    // đảm bảo sạch lịch sử trước khi chơi
+                    game.phase = 'playing';
+                    game.called = [];
+                    game.last = null;
+                    game.locked = false;
+                    game.winner = null;
+                    game.updatedAt = Date.now();
+                    return game;
+                });
+            }
+
+            function drawNumber() {
+                const gameRef = db.ref(`rooms/${roomId}/game`);
+                return gameRef.transaction((game) => {
+                    if (!game) return game;
+                    if (game.mcPlayerId !== playerId) return game;
+                    if (game.phase !== 'playing') return game;
+                    if (game.locked || game.winner) return game;
+
+                    const called = Array.isArray(game.called) ? game.called.slice() : [];
+                    if (called.length >= 90) return game;
+
+                    const used = new Set(called);
+                    const remaining = [];
+                    for (let i = 1; i <= 90; i++) if (!used.has(i)) remaining.push(i);
+                    const n = remaining[Math.floor(Math.random() * remaining.length)];
+
+                    called.push(n);
+                    game.called = called;
+                    game.last = n;
+                    game.updatedAt = Date.now();
+                    return game;
+                });
+            }
+
+            function undoNumber() {
+                const gameRef = db.ref(`rooms/${roomId}/game`);
+                return gameRef.transaction((game) => {
+                    if (!game) return game;
+                    if (game.mcPlayerId !== playerId) return game;
+                    if (game.phase !== 'playing') return game;
+                    if (game.locked || game.winner) return game;
+
+                    const called = Array.isArray(game.called) ? game.called.slice() : [];
+                    called.pop();
+                    game.called = called;
+                    game.last = called.length ? called[called.length - 1] : null;
+                    game.updatedAt = Date.now();
+                    return game;
+                });
+            }
+
+            function toggleLock(locked) {
+                const gameRef = db.ref(`rooms/${roomId}/game`);
+                return gameRef.transaction((game) => {
+                    if (!game) return game;
+                    if (game.mcPlayerId !== playerId) return game;
+                    if (game.phase !== 'playing') return game;
+                    if (game.winner) return game;
+                    game.locked = !!locked;
+                    game.updatedAt = Date.now();
+                    return game;
+                });
+            }
+
+            function resetRoom() {
+                return db.ref(`rooms/${roomId}`).remove();
+            }
+
+            function claimWin(name) {
+                const gameRef = db.ref(`rooms/${roomId}/game`);
+                return gameRef.transaction((game) => {
+                    if (!game) return game;
+                    if (game.phase !== 'playing') return game;
+                    if (game.locked || game.winner) return game;
+
+                    game.winner = { playerId, name, at: Date.now() };
+                    game.phase = 'ended';
+                    game.locked = true;
+                    game.updatedAt = Date.now();
+                    return game;
+                });
+            }
+
+            /* ===== UI helpers ===== */
+            function getPlayerName(playersObj, pid) {
+                return playersObj && pid && playersObj[pid] && playersObj[pid].name ? playersObj[pid].name : '—';
+            }
+
+            function renderPlayersList(playersObj, mcId) {
+                const players = playersObj ? Object.values(playersObj) : [];
+                const list = players.filter((p) => p && p.name).sort((a, b) => (a.joinedAt || 0) - (b.joinedAt || 0));
+                playersPill.textContent = `Người chơi: ${list.length}`;
+
+                if (!list.length) {
+                    playersListEl.textContent = '—';
+                    return;
+                }
+                playersListEl.textContent = list.map((p) => `• ${p.name}${p.id === mcId ? ' (MC)' : ''}`).join('\n');
+                playersListEl.style.whiteSpace = 'pre-line';
+
+                if (isMC) {
+                    transferWrap.style.display = list.length >= 2 ? 'block' : 'none';
+                    transferTo.innerHTML = '';
+                    list.filter((p) => p.id !== playerId).forEach((p) => {
+                        const opt = document.createElement('option');
+                        opt.value = p.id;
+                        opt.textContent = p.name;
+                        transferTo.appendChild(opt);
+                    });
+                } else {
+                    transferWrap.style.display = 'none';
+                }
+            }
+
+            function phaseLabel(phase) {
+                if (phase === 'waiting') return 'CHỜ';
+                if (phase === 'playing') return 'ĐANG CHƠI';
+                if (phase === 'ended') return 'ĐÃ KINH';
+                return '—';
+            }
+
+            function updateUIState(game, playersObj, me) {
+                const mcId = game?.mcPlayerId || null;
+                isMC = mcId === playerId;
+
+                // takeover logic
+                const now = Date.now();
+                const mcLastSeen = mcId && playersObj?.[mcId]?.lastSeenAt ? playersObj[mcId].lastSeenAt : 0;
+                const mcMissing = mcId && !playersObj?.[mcId];
+                const mcStale = mcId && mcLastSeen && now - mcLastSeen > 45000;
+                const canTakeover = !mcId || mcMissing || mcStale;
+
+                const mcName = mcId ? getPlayerName(playersObj, mcId) : 'Chưa có';
+                mcInfo.textContent = `MC: ${mcName}${isMC ? ' (Bạn)' : ''}${!mcId ? '' : mcMissing ? ' • (đã rời)' : mcStale ? ' • (mất kết nối)' : ''}`;
+
+                btnClaimMC.disabled = !roomId || isMC || !canTakeover;
+                btnReleaseMC.disabled = !roomId || !isMC;
+
+                const phase = game.phase || 'waiting';
+                const hasWinner = !!game.winner;
+                const locked = !!game.locked;
+
+                phasePill.textContent = `Trạng thái: ${phaseLabel(phase)}`;
+                phaseMini.textContent = `${phaseLabel(phase)} • Round ${game.roundId || 0}`;
+
+                lockPill.style.display = locked ? 'inline-flex' : 'none';
+                chkLock.checked = locked;
+
+                // ticket size UI
+                const rows = game.ticketRows || 5;
+                const cols = game.ticketCols || 5;
+                ticketSizeSel.value = `${rows}x${cols}`;
+                ticketSizeSel.disabled = !roomId || !isMC || phase !== 'waiting';
+
+                // MC buttons
+                btnNewRound.disabled = !roomId || (!!mcId && !isMC); // nếu có MC khác thì không cho
+                btnStartPlay.disabled = !roomId || !isMC || phase !== 'waiting';
+                btnDraw.disabled = !roomId || !isMC || phase !== 'playing' || locked || hasWinner;
+                btnUndo.disabled = !roomId || !isMC || phase !== 'playing' || locked || hasWinner;
+                btnResetRoom.disabled = !roomId || !isMC;
+                chkLock.disabled = !roomId || !isMC || phase !== 'playing' || hasWinner;
+
+                // quick new round show when ended
+                const showQuick = roomId && phase === 'ended' && isMC;
+                mcQuickBar.style.display = showQuick ? 'flex' : 'none';
+
+                // overlay button enable only for MC
+                btnOverlayNewRound.disabled = !roomId || !isMC;
+
+                // Player ticket
+                const meHasValid = isValidTicketForRound(me, game);
+                btnNewTicket.disabled = !roomId || phase !== 'waiting'; // chỉ CHỜ mới đổi vé
+                btnClearMarks.disabled = !roomId || phase !== 'waiting' || !meHasValid;
+
+                // hint
+                if (phase === 'waiting') {
+                    phaseHint.innerHTML = `Trạng thái <b>CHỜ</b>: mọi người có thể tạo/đổi vé. MC chọn kích thước (5x5 hoặc 9x5) rồi bấm <b>Bắt đầu chơi</b>.`;
+                } else if (phase === 'playing') {
+                    phaseHint.innerHTML = `Trạng thái <b>ĐANG CHƠI</b>: không đổi vé. Nếu bạn có vé hợp lệ thì chỉ thấy vé của mình.`;
+                } else if (phase === 'ended') {
+                    phaseHint.innerHTML = `Trạng thái <b>ĐÃ KINH</b>: ván dừng. MC bấm <b>Bắt đầu ván mới</b> để chuyển về CHỜ.`;
+                } else {
+                    phaseHint.textContent = '—';
+                }
+
+                return meHasValid;
+            }
+
+            /* ===== Room sync ===== */
+            function onRoomUpdate(snapshot) {
+                const data = snapshot.val();
+                if (!data) {
+                    setConnectedUI(false, 'Phòng đã bị xoá');
+                    roomInfo.textContent = '';
+                    lastNumValue.textContent = '—';
+                    countPill.textContent = 'Đã kêu: 0/90';
+                    playersPill.textContent = 'Người chơi: 0';
+                    playersListEl.textContent = '—';
+                    mcInfo.textContent = 'Chưa vào phòng';
+                    allTicketsPanel.style.display = 'none';
+                    mcQuickBar.style.display = 'none';
+                    hideWinner();
+                    renderBoard(new Set(), null);
+                    renderHistory([]);
+                    ticketWrap.style.display = 'none';
+                    return;
+                }
+
+                const game = data.game || {};
+                const playersObj = data.players || {};
+                const me = playersObj[playerId] || null;
+
+                const calledArr = Array.isArray(game.called) ? game.called : [];
+                const calledSet = new Set(calledArr);
+                const last = typeof game.last === 'number' ? game.last : null;
+
+                // UI state
+                const meHasValid = updateUIState(game, playersObj, me);
+
+                // info
+                const rows = game.ticketRows || 5;
+                const cols = game.ticketCols || 5;
+                roomInfo.innerHTML = `
+    <div>Mã phòng: <span class="mono"><b>${roomId}</b></span></div>
+    <div>Round: <b>${game.roundId || 0}</b> • Vé: <b>${rows}x${cols}</b> • Cập nhật: ${game.updatedAt ? new Date(game.updatedAt).toLocaleString('vi-VN') : '—'}</div>
+  `;
+
+                renderPlayersList(playersObj, game.mcPlayerId || null);
+
+                // main board
+                lastNumValue.textContent = last ? String(last).padStart(2, '0') : '—';
+                countPill.textContent = `Đã kêu: ${calledArr.length}/90`;
+                renderBoard(calledSet, last);
+                renderHistory(calledArr);
+
+                // overlay
+                if (game.winner) showWinner(game.winner);
+                else hideWinner();
+
+                // render my ticket + save local marks
+                renderMyTicket(game, me, calledSet);
+
+                // Only show all tickets to users without valid ticket
+                renderAllTicketsIfNeeded(game, playersObj, calledSet, meHasValid);
+
+                // MC speak
+                if (isMC && chkSpeak.checked && last && last !== lastSeenSpokenNum && !game.winner) {
+                    lastSeenSpokenNum = last;
+                    speak(`Số ${last}. ${readNumberVN(last)}.`);
+                }
+                if (isMC && chkSpeak.checked && game.winner?.at && game.winner.at !== lastWinSpokenAt) {
+                    lastWinSpokenAt = game.winner.at;
+                    speak(`Kinh! ${game.winner.name || 'có người kinh'}.`);
+                }
+
+                // Auto claim win: chỉ khi PLAYING + có vé hợp lệ
+                if (game.phase === 'playing' && !game.winner && !game.locked && meHasValid) {
+                    const t = me.ticket;
+                    if (hasAnyFullRow(t, rows, cols, calledSet)) {
+                        const name = (nameInput.value || '').trim() || 'Không tên';
+                        claimWin(name);
+                    }
+                }
+            }
+
+            function attachRoom(rid) {
+                roomRef = db.ref('rooms/' + rid);
+                roomRef.on('value', onRoomUpdate);
+            }
+            function detachRoom() {
+                if (roomRef) roomRef.off();
+                roomRef = null;
+            }
+
+            /* ===== Presence ===== */
+            async function registerPlayer() {
+                const name = (nameInput.value || '').trim();
+                if (!name) {
+                    alert('Bạn cần nhập Tên của bạn.');
+                    return false;
+                }
+
+                playerRef = db.ref(`rooms/${roomId}/players/${playerId}`);
+                try {
+                    playerRef.onDisconnect().remove();
+                } catch {}
+
+                const now = Date.now();
+                await playerRef.update({
+                    id: playerId,
+                    name,
+                    joinedAt: now,
+                    lastSeenAt: now,
+                });
+
+                if (heartbeatTimer) clearInterval(heartbeatTimer);
+                heartbeatTimer = setInterval(() => {
+                    if (playerRef) playerRef.update({ lastSeenAt: Date.now() });
+                }, 15000);
+
+                loadTicketLocal();
+                return true;
+            }
+
+            async function unregisterPlayer() {
+                if (heartbeatTimer) {
+                    clearInterval(heartbeatTimer);
+                    heartbeatTimer = null;
+                }
+                if (playerRef) {
+                    try {
+                        await playerRef.remove();
+                    } catch {}
+                    playerRef = null;
+                }
+            }
+
+            /* ===== UI events ===== */
+            btnCreate.addEventListener('click', () => (roomInput.value = genRoomId()));
+
+            btnJoin.addEventListener('click', async () => {
+                if (!safeInitFirebase()) return;
+
+                roomId = roomInput.value.trim();
+                if (!roomId) return alert('Nhập Mã phòng trước.');
+                if (!(nameInput.value || '').trim()) return alert('Nhập Tên của bạn trước.');
+
+                btnJoin.disabled = true;
+                btnLeave.disabled = false;
+                roomInput.disabled = true;
+                btnCreate.disabled = true;
+                nameInput.disabled = true;
+
+                setConnectedUI(true, 'Đang kết nối…');
+
+                detachRoom();
+                attachRoom(roomId);
+                await ensureRoomStructure();
+
+                const ok = await registerPlayer();
+                if (!ok) {
+                    btnLeave.click();
+                    return;
+                }
+
+                setConnectedUI(true, 'Đã vào phòng');
+            });
+
+            btnLeave.addEventListener('click', async () => {
+                hideWinner();
+                detachRoom();
+                await unregisterPlayer();
+
+                setConnectedUI(false, 'Đã rời phòng');
+
+                roomInfo.textContent = '';
+                lastNumValue.textContent = '—';
+                countPill.textContent = 'Đã kêu: 0/90';
+                phasePill.textContent = 'Trạng thái: —';
+                playersPill.textContent = 'Người chơi: 0';
+                playersListEl.textContent = '—';
+                mcInfo.textContent = 'Chưa vào phòng';
+                phaseMini.textContent = '—';
+                phaseHint.textContent = '—';
+
+                allTicketsPanel.style.display = 'none';
+                allTicketsEl.innerHTML = '';
+                mcQuickBar.style.display = 'none';
+                ticketWrap.style.display = 'none';
+
+                roomInput.disabled = false;
+                btnCreate.disabled = false;
+                btnJoin.disabled = false;
+                btnLeave.disabled = true;
+                nameInput.disabled = false;
+
+                roomId = '';
+            });
+
+            btnClaimMC.addEventListener('click', async () => {
+                if (roomId) await claimMC();
+            });
+            btnReleaseMC.addEventListener('click', async () => {
+                if (roomId) await releaseMC();
+            });
+            btnTransferMC.addEventListener('click', async () => {
+                if (roomId) await transferMC(transferTo.value);
+            });
+
+            ticketSizeSel.addEventListener('change', async () => {
+                if (!roomId || !isMC) return;
+                const v = ticketSizeSel.value; // "5x5" | "5x9"
+                const [r, c] = v.split('x').map(Number);
+                await setTicketSize(r, c);
+            });
+
+            btnNewRound.addEventListener('click', async () => {
+                if (roomId) await startNewRoundWaiting();
+            });
+            btnQuickNewRound.addEventListener('click', async () => {
+                if (roomId) await startNewRoundWaiting();
+            });
+            btnOverlayNewRound.addEventListener('click', async () => {
+                if (roomId && isMC) await startNewRoundWaiting();
+            });
+            btnOverlayClose.addEventListener('click', () => hideWinner());
+
+            btnStartPlay.addEventListener('click', async () => {
+                if (roomId) await startPlay();
+            });
+            btnDraw.addEventListener('click', async () => {
+                if (roomId) await drawNumber();
+            });
+            btnUndo.addEventListener('click', async () => {
+                if (roomId) await undoNumber();
+            });
+
+            chkLock.addEventListener('change', async () => {
+                if (roomId) await toggleLock(chkLock.checked);
+            });
+
+            btnResetRoom.addEventListener('click', async () => {
+                if (!roomId) return;
+                if (!confirm('Xoá phòng sẽ làm mọi người bị ngắt. Bạn chắc chắn?')) return;
+                await resetRoom();
+            });
+
+            btnNewTicket.addEventListener('click', async () => {
+                if (!roomId) return;
+                // tạo vé theo kích thước ván hiện tại (đọc từ UI select là đúng vì đã sync)
+                const [rows, cols] = ticketSizeSel.value.split('x').map(Number);
+
+                // lấy roundId hiện tại từ DB (để tránh lệch)
+                const snap = await db.ref(`rooms/${roomId}/game`).once('value');
+                const game = snap.val();
+                if (!game || game.phase !== 'waiting') return alert('Chỉ tạo/đổi vé khi đang CHỜ.');
+
+                const meta = { roundId: game.roundId, rows: game.ticketRows || rows, cols: game.ticketCols || cols };
+                const t = generateTicket(meta.rows, meta.cols);
+
+                localTicket.ticket = t;
+                localTicket.meta = meta;
+                marked = new Set();
+                saveTicketLocal();
+
+                await saveTicketToDB(t, meta);
+            });
+
+            btnClearMarks.addEventListener('click', () => {
+                marked = new Set();
+                saveTicketLocal();
+            });
+
+            /* init */
+            renderBoard(new Set(), null);
+            renderHistory([]);
+        </script>
+    </body>
+</html>
